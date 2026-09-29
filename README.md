@@ -12,3 +12,5 @@ Then run `/reload` in pi and ask the agent to run `sleep 10`.
 
 
 P.S: 'sheep' is a bit of a stretch — if you know of a better way to render it please open a PR :p 
+
+AI Disclaimer: Impl was solely by deepseek 4.1 pro; the idea came to me in a dream.  
