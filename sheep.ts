@@ -68,9 +68,9 @@ function isAirborne(height: number): boolean {
 }
 
 export function renderSheep(tick: number): string[] {
-  // The fence sweeps right-to-left across the screen, wrapping.
-  const cycleLen = WIDTH + 10; // a bit wider so fence fully exits
-  const fenceX = WIDTH - ((tick * SPEED) % cycleLen);
+  // Fixed fence at center; sheep walk right, hop it, and wrap around.
+  const fenceX = 28;
+  const sheepCycle = WIDTH + 12; // sheep wrap after exiting right
 
   // Build a 2D character buffer
   const buf: string[][] = Array.from({ length: ROWS }, () =>
@@ -99,7 +99,8 @@ export function renderSheep(tick: number): string[] {
   // Draw each sheep
   const fenceCenter = fenceX + 1; // center of the 3-wide fence
   for (let k = 0; k < N_SHEEP; k++) {
-    const sx = SHEEP_X0 + k * SHEEP_SPACING;
+    const sx =
+      ((SHEEP_X0 + k * SHEEP_SPACING + tick * SPEED) % sheepCycle) - 12;
     const sheepCenter = sx + 4; // roughly the middle of the 9-char-wide art
     const height = jumpHeight(fenceCenter, sheepCenter);
 
@@ -129,12 +130,15 @@ export default function (pi: ExtensionAPI) {
   let ui: any = null;
   let interval: ReturnType<typeof setInterval> | null = null;
   let tick = 0;
+  let frame = renderSheep(0);
+  let requestRender: (() => void) | null = null;
 
   const stop = () => {
     if (interval) {
       clearInterval(interval);
       interval = null;
     }
+    requestRender = null;
     ui?.setWidget("sheep", undefined);
     ui = null;
   };
@@ -142,10 +146,22 @@ export default function (pi: ExtensionAPI) {
   const start = (ctx: any) => {
     ui = ctx.ui;
     tick = 0;
-    ui.setWidget("sheep", renderSheep(0));
+    frame = renderSheep(0);
+    // Component form: lines render verbatim (no Text wrapping), so the
+    // widget height stays constant and the layout doesn't bounce.
+    ui.setWidget("sheep", (tui: any, _theme: any) => {
+      requestRender = () => tui.requestRender();
+      return {
+        render: (width?: number) => {
+          const w = typeof width === "number" ? width : WIDTH;
+          return frame.map((l) => l.slice(0, w).padEnd(w, " "));
+        },
+        invalidate: () => {},
+      };
+    });
     interval = setInterval(() => {
-      tick++;
-      ui?.setWidget("sheep", renderSheep(tick));
+      frame = renderSheep(tick++);
+      requestRender?.();
     }, TICK_MS);
   };
 

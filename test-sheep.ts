@@ -15,12 +15,19 @@ assert.ok(frames.some((f) => f.some((l) => l.includes("(ooo)"))), "sheep present
 assert.ok(frames.some((f) => f.some((l) => l.includes("│"))), "fence present");
 assert.ok(frames.some((f) => f[1].includes("_")), "sheep rises mid-jump");
 for (const f of frames) {
-	assert.equal(f.join("\n").split("(ooo)").length - 1, 3, "three sheep per frame");
+	assert.ok(
+		f.join("\n").split("(ooo)").length - 1 >= 2,
+		"at least two sheep visible per frame",
+	);
 	assert.ok(
 		f.join("").split("│").length - 1 <= 1,
 		"no more than one fence per frame",
 	);
 }
+assert.ok(
+	frames.some((f) => f.join("\n").split("(ooo)").length - 1 === 3),
+	"three sheep visible at once",
+);
 assert.ok(
 	frames.some((f) => {
 		const rows = new Set(f.flatMap((l, r) => (l.includes("(ooo)") ? [r] : [])));
@@ -48,6 +55,10 @@ const bash = (id: string, command: string) => ({
 
 handlers.tool_execution_start(bash("a", "sleep 2 && echo done"), makeCtx());
 assert.ok(shown, "sleep starts the widget");
+const widgetFactory = shown;
+const component = widgetFactory({ requestRender: () => {} }, null);
+assert.equal(component.render(60).length, 7, "widget renders 7 stable lines");
+assert.equal(component.render(40).length, 7, "widget lines clip, never wrap");
 handlers.tool_execution_start(bash("b", "sleep 1"), makeCtx());
 handlers.tool_execution_end({ toolCallId: "a", toolName: "bash" });
 assert.ok(shown, "widget stays while a second sleep is still running");
