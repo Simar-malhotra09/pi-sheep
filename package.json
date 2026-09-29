@@ -1,0 +1,13 @@
+{
+  "name": "pi-sheep",
+  "version": "1.0.0",
+  "description": "Counting sheep for pi: ASCII sheep hop a fence in the TUI while bash sleep tool calls run.",
+  "keywords": ["pi-package"],
+  "license": "MIT",
+  "pi": {
+    "extensions": ["./sheep.ts"]
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*"
+  }
+}
