@@ -1,5 +1,7 @@
 # pi-sheep
 
+![counting sheep demo](pi-sheep.gif)
+
 Counting sheep for [pi](https://pi.dev): while a bash `sleep` tool call runs,
 a widget above the editor shows three ASCII sheep on a dotted field. A fence
 sweeps past and each sheep hops it with a little jump arc.

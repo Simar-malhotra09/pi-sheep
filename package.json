@@ -5,7 +5,8 @@
   "keywords": ["pi-package"],
   "license": "MIT",
   "pi": {
-    "extensions": ["./sheep.ts"]
+    "extensions": ["./sheep.ts"],
+    "image": "https://raw.githubusercontent.com/Simar-malhotra09/pi-sheep/main/pi-sheep.gif"
   },
   "peerDependencies": {
     "@earendil-works/pi-coding-agent": "*"
